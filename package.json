@@ -1,0 +1,10 @@
+{
+    "name":"solo",
+    "private": true,
+    "version": "0.0.0",
+    "scripts": {
+        "b": "pnpm --filter @solo/backend",
+        "f": "pnpm --filter @solo/front",
+        "dev": "pnpm -r --parallel dev"
+    }
+}

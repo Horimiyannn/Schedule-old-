@@ -1,49 +1,92 @@
-// import { initTRPC } from '@trpc/server'
-
-// const ideas = [
-//   { nick: 'cool-idea-nick-1', name: 'Idea 1', description: 'Description of idea 1...' },
-//   { nick: 'cool-idea-nick-2', name: 'Idea 2', description: 'Description of idea 2...' },
-//   { nick: 'cool-idea-nick-3', name: 'Idea 3', description: 'Description of idea 3...' },
-//   { nick: 'cool-idea-nick-4', name: 'Idea 4', description: 'Description of idea 4...' },
-//   { nick: 'cool-idea-nick-5', name: 'Idea 5', description: 'Description of idea 5...' },
-// ]
-
-// const trpc = initTRPC.create()
-
-// export const trpcRouter = trpc.router({
-//   getIdeas: trpc.procedure.query(() => {
-//     return { ideas }
-//   }),
-// })
-
-// export type TrpcRouter = typeof trpcRouter
+import { initTRPC } from "@trpc/server";
+import { lessons } from "./data/lessondata";
+import { PrismaClient } from "@prisma/client";
+import { z } from "zod";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { error } from "console";
 
 
-// import { initTRPC } from '@trpc/server';
-// import { lessons, Lesson } from './data/lessondata';
-
-// const trpc = initTRPC.create();
-
-// export const appRouter = trpc.router({
-//     getLessons: trpc.procedure.query((): Lesson[] => {
-//         return lessons;
-//     }),
-// });
-
-// // Export type definition of API
-// export type AppRouter = typeof appRouter;
-
-
-import { initTRPC } from '@trpc/server';
-import { lessons } from './data/lessondata';
-
+const prisma = new PrismaClient();
 const trpc = initTRPC.create();
 
-export const appRouter = trpc.router({
-    getLessons: trpc.procedure.query(() => {
-        return lessons;
-    }),
-});
+const JWT_SECRET = 'barotrauma';
 
+export const appRouter = trpc.router({
+  getLessons: trpc.procedure.query(async () => {
+    return await prisma.lesson.findMany({
+      include: {
+        times: true,
+      },
+    });
+  }),
+  addLesson: trpc.procedure
+    .input(
+      z.object({
+        name: z.string(),
+        link: z.string(),
+        times: z.array(z.string()),
+        userId: z.string(),
+        notes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { times, ...lessonData } = input;
+
+      const lesson = await prisma.lesson.create({
+        data: {
+          ...lessonData,
+          times: {
+            create: times.map((time) => ({ time })),
+          },
+        },
+      });
+
+      return lesson;
+    }),
+    addUser: trpc.procedure
+    .input(
+      z.object({
+        name: z.string(),
+        email: z.string().email(),
+        password: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const hashedPassword = await bcrypt.hash(input.password, 10);
+      return await prisma.user.create({
+        data: {
+          ...input,
+          password: hashedPassword,
+        },
+      });
+    }),
+    loginUser: trpc.procedure
+    .input(
+     z.object({
+      email: z.string().email(),
+      password: z.string(),
+     })
+    )
+    .mutation(async ({input}) => {
+      const user = await prisma.user.findUnique({
+        where: { email: input.email},
+      });
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const isValidPassword = await bcrypt.compare(input.password, user.password);
+
+      if (!isValidPassword) {
+        throw new Error('Invalid password');
+      }
+
+      const token = jwt.sign({ userId: user.id}, JWT_SECRET, {expiresIn: '1h' });
+
+      return {token, user}
+    })
+  });
 // Export type definition of API
 export type AppRouter = typeof appRouter;

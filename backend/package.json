@@ -5,19 +5,32 @@
 	"scripts": {
 		"dev": "ts-node-dev --rs ./src/index.ts",
 		"build": "tsc --build ./tsconfig.json",
-		"start": "node ./dist/index.js"
+		"start": "node ./dist/index.js",
+		"pmd": "prisma migrate dev",
+		"cu": "ts-node-dev ./createuser.ts"
+	},
+	"prisma": {
+		"schema": "src/prisma/schema.prisma"
 	},
 	"devDependencies": {
+		"@types/bcrypt": "^5.0.2",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.0",
+		"@types/jsonwebtoken": "^9.0.8",
 		"prettier": "^3.4.2",
 		"ts-node-dev": "^2.0.0",
 		"typescript": "^5.7.3"
 	},
 	"dependencies": {
+		"-": "^0.0.1",
+		"@prisma/client": "^6.3.0",
 		"@trpc/server": "^10.45.2",
 		"@types/node": "^22.10.10",
+		"bcrypt": "^5.1.1",
 		"cors": "^2.8.5",
-		"express": "^4.21.2"
+		"express": "^4.21.2",
+		"jsonwebtoken": "^9.0.2",
+		"prisma": "^6.3.0",
+		"zod": "^3.24.1"
 	}
 }

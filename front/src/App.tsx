@@ -5,12 +5,13 @@ import Homework from './pages/homework.tsx';
 import Notes from './pages/notes.tsx';
 import Auth from './pages/auth.tsx';
 import Profile from './pages/profile.tsx';
+import CreateUser from './components/CreateUser.tsx';
 
 const AppLayout: React.FC = () => {
     const location = useLocation(); // Отримуємо поточний шлях
 
     // Масив сторінок, де не потрібно показувати sidebar
-    const hiddenSidebarRoutes = ['/auth'];
+    const hiddenSidebarRoutes = ['/auth', '/registration'];
 
     return (
         <div className='container'>
@@ -33,6 +34,7 @@ const AppLayout: React.FC = () => {
                     <Route path="/notes" element={<Notes />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/registration" element={<CreateUser />} />
                 </Routes>
             </div>
         </div>

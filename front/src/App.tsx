@@ -32,7 +32,7 @@ const AppLayout: React.FC = () => {
                     <Route path="/" element={<Main />} />
                     <Route path="/homework" element={<Homework />} />
                     <Route path="/notes" element={<Notes />} />
-                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/auth/" element={<Auth />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/registration" element={<CreateUser />} />
                 </Routes>

@@ -25,26 +25,42 @@ model LessonTime {
   lesson   Lesson @relation(fields: [lessonId], references: [id])
 }
 
-// уроки можуть повторюватись на неділі, треба окрема таблиця, з датою проведення урока
-
 model User {
-  id       String     @id @default(uuid())
-  email    String     @unique
-  password String
-  name     String
-  lessons  Lesson[]
-  homework Homework[]
-  role     Role       @default(STUDENT)
+  id                   String                 @id @default(uuid())
+  email                String                 @unique
+  password             String
+  name                 String
+  lessons              Lesson[]
+  homework             Homework[]
+  role                 Role                   @default(STUDENT)
+  LessonCompleteStatus LessonCompleteStatus[]
+  Token                Token[]
 }
 
 model Homework {
-  id          String   @id @default(uuid())
-  task        String
-  isCompleted Boolean
-  lesson      Lesson   @relation(fields: [lessonId], references: [id])
-  lessonId    String
-  givenTo     User[]
-  deadline    DateTime
+  id                   String                 @id @default(uuid())
+  task                 String
+  lesson               Lesson                 @relation(fields: [lessonId], references: [id])
+  lessonId             String
+  givenTo              User[]
+  deadline             DateTime
+  LessonCompleteStatus LessonCompleteStatus[]
+}
+
+model LessonCompleteStatus {
+  id         String   @id @default(uuid())
+  completed  Boolean  @default(false)
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  homework   Homework @relation(fields: [homeworkId], references: [id])
+  homeworkId String
+}
+
+model Token {
+  id           String @id @default(uuid())
+  refreshToken String
+  user         User   @relation(fields: [userId], references: [id])
+  userId       String
 }
 
 enum Role {

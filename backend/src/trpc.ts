@@ -13,37 +13,7 @@ const trpc = initTRPC.create();
 const JWT_SECRET = 'barotrauma';
 
 export const appRouter = trpc.router({
-  getLessons: trpc.procedure.query(async () => {
-    return await prisma.lesson.findMany({
-      include: {
-        times: true,
-      },
-    });
-  }),
-  addLesson: trpc.procedure
-    .input(
-      z.object({
-        name: z.string(),
-        link: z.string(),
-        times: z.array(z.string()),
-        userId: z.string(),
-        notes: z.string().optional(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const { times, ...lessonData } = input;
-
-      const lesson = await prisma.lesson.create({
-        data: {
-          ...lessonData,
-          times: {
-            create: times.map((time) => ({ time })),
-          },
-        },
-      });
-
-      return lesson;
-    }),
+ 
     addUser: trpc.procedure
     .input(
       z.object({
@@ -83,10 +53,58 @@ export const appRouter = trpc.router({
         throw new Error('Invalid password');
       }
 
-      const token = jwt.sign({ userId: user.id}, JWT_SECRET, {expiresIn: '1h' });
+      const token = jwt.sign({ userId: user.id}, JWT_SECRET, {expiresIn: '1w' });
 
       return {token, user}
-    })
+    }),
+    getUserInfo: trpc.procedure
+    .input(z.object({ token: z.string() }))
+    .query(async ({ input }) => {
+      try {
+        const decoded = jwt.verify(input.token, JWT_SECRET) as { userId: string };
+        const user = await prisma.user.findUnique({
+          where: { id: decoded.userId },
+        });
+        if (!user) {
+          throw new Error('User not found');
+        }
+        return user;
+      } catch (error) {
+        throw new Error('Invalid token');
+      }
+    }),
+    getUserSchedule: trpc.procedure
+    .input(z.object({ token: z.string() }))
+    .query(async ({ input }) => {
+      try {
+        const decoded = jwt.verify(input.token, JWT_SECRET) as { userId: string };
+        const lessons = await prisma.lesson.findMany({
+          where: { userId: decoded.userId },
+          include: { times: true },
+        });
+        return lessons;
+      } catch (error) {
+        throw new Error('Invalid token');
+      }
+    }),
+    getSession: trpc.procedure.query(({ ctx }) => {
+      const authHeader = ctx.req.headers.authorization;
+      if (!authHeader) {
+        return null;
+      }
+  
+      const token = authHeader.split(' ')[1];
+      if (!token) {
+        return null;
+      }
+  
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return { userId: decoded.userId };
+      } catch {
+        return null;
+      }
+    }),
   });
 // Export type definition of API
 export type AppRouter = typeof appRouter;

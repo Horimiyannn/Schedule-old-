@@ -56,6 +56,12 @@ export const trpcClient = trpc.createClient({
     links: [
       httpBatchLink({
         url: 'http://localhost:3000/trpc', 
+        headers() {
+          const token = localStorage.getItem('token');
+          return {
+            Authorization: `Bearer ${token}`,
+          }
+        }
       }),
     ],
   });

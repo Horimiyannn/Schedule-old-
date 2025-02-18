@@ -1,67 +1,47 @@
-// import type { TrpcRouter } from '@solo/backend/src/trpc'
-// import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createTRPCReact } from "@trpc/react-query";
+import type { trpcRouter } from "../../../backend/src/trpc/trpc";
+import { httpBatchLink } from "@trpc/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// import { createTRPCReact, httpBatchLink } from "@trpc/react-query";
+// eslint-disable-next-line react-refresh/only-export-components
+export const trpc = createTRPCReact<trpcRouter>();
 
-// const trpc = createTRPCReact<TrpcRouter>()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-// const queryClient = new QueryClient({
-//     defaultOptions:{
-//         queries:{
-//             retry:false,
-//             refetchOnWindowFocus:false,
-//         },
-//     },
-// })
+const trpcClient = trpc.createClient({
+  links: [
+    httpBatchLink({
+      url: "http://localhost:3000/trpc",
+    }),
+  ],
+});
 
-// const trpcClient = trpc.createClient({
+export const TrpcProvider = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </trpc.Provider>
+  );
+};
+
+
+//  const trpcClient = trpc.createClient({
 //     links: [
-//         httpBatchLink({
-//             url:'/http://localhost:3000/trpc',
-//         }),
+//       httpBatchLink({
+//         url: 'http://localhost:3000/trpc', 
+//         headers() {
+//           const token = localStorage.getItem('token');
+//           return {
+//             Authorization: `Bearer ${token}`,
+//           }
+//         }
+//       }),
 //     ],
-// })
-
-// export const TrpcProvider = ({ children }: { children: React.ReactNode }) => {
-//     return (
-//       <trpc.Provider client={trpcClient} queryClient={queryClient}>
-//         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-//       </trpc.Provider>
-//     )
-//   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import { createTRPCReact } from '@trpc/react-query';
-import type { AppRouter } from '../../../backend/src/trpc';
-import { httpBatchLink } from '@trpc/client';
-
-export const trpc = createTRPCReact<AppRouter>();
-
-export const trpcClient = trpc.createClient({
-    links: [
-      httpBatchLink({
-        url: 'http://localhost:3000/trpc', 
-        headers() {
-          const token = localStorage.getItem('token');
-          return {
-            Authorization: `Bearer ${token}`,
-          }
-        }
-      }),
-    ],
-  });
+//   });

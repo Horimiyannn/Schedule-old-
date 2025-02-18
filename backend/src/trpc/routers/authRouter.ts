@@ -1,5 +1,6 @@
 //регістрація
 //авторизація
+//логаут
 
 // import { TRPCError } from '@trpc/server';
 // import jwt from 'jsonwebtoken';

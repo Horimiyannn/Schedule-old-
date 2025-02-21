@@ -13,10 +13,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
+/* body {
   margin: 0;
   display: flex;
-  /* place-items: center; */
+  place-items: center; 
   min-width: 320px;
   min-height: 100vh;
 }
@@ -29,42 +29,34 @@ h1 {
 h2 {
   margin-top: auto;
   margin-left: 20px;
-  /* border-radius: 53 px; */
-  /* border: 3px solid #213547; */
+  border-radius: 53 px;
+  border: 3px solid #213547;
   padding: auto;
-  /* border-left: 1 px solid #535bf2; */
+  border-left: 1 px solid #535bf2;
 }
 
 h3 {
   color:#ddd;
   font-size: 20px;
-}
+} */
 
 
-.schedule-day {
-  /* border: 1px solid #ff1111; */
-  padding: 10px;
-  margin: 10px;
-  background-color: #344e4c;
-  color:#fa4343;
-  border-radius: 10px; /* Опціонально: закруглені кути */
-  box-shadow: 0px 4px 10px rgba(255, 246, 246, 0.295); /* Опціонально: тінь */
-}
-.container {
+
+/* .container {
   display: flex;
   flex-direction: row;
-}
+} */
 
-.sidebar {
+/* .sidebar {
   width: auto;
   background-color: #a73333;
   padding: 15px;
   height: auto;
   border: 1px solid #ffffff;
   border-radius: 5px;
-}
+} */
 
-.sidebar ul {
+/* .sidebar ul {
   list-style: none;
   padding: 0;
 }
@@ -79,21 +71,21 @@ h3 {
   color: #ffffff;
   font-size: large;
   font-weight: bold;
-}
+} */
 
-.content {
+/* .content {
   flex-grow: 1;
   padding: 20px;
 
-}
+} */
 
-.schedule-container {
+/* .schedule-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
-}
+} */
 
-@media (min-width: 1024px) {
+/* @media (min-width: 1024px) {
   .schedule-container {
       grid-template-columns: repeat(3, 1fr);
   }
@@ -111,9 +103,9 @@ h3 {
   .schedule-container {
       grid-template-columns: repeat(1, 1fr);
   }
-}
+} */
 
-.schedule-list {
+/* .schedule-list {
   display: flex;
   flex-direction: column;
   padding: 0;
@@ -121,7 +113,7 @@ h3 {
 
 .schedule-item {
   display: flex;
-  /* align-items: center; */
+  align-items: center;
   gap: 10px;
   margin-bottom: 10px;
   border-bottom: 2px solid #c75551;
@@ -135,8 +127,8 @@ h3 {
   font-weight: bold;
   min-width: 45px;
   border-right: 1px solid #7b8d9e;
-  /* border-left: 1px solid #213547; */
-  /* border-radius: 5px; */
+  border-left: 1px solid #213547;
+  border-radius: 5px;
   display:inline-block;
 
 }
@@ -166,10 +158,10 @@ h3 {
 
 .top-bar {
   width: 100%;
-  /* background-color: #a73333; */
+  background-color: #a73333;
   padding: 15px;
   height: auto;
-  /* border: 1px solid #ffffff; */
+  border: 1px solid #ffffff;
   border-radius: 5px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -185,7 +177,7 @@ h3 {
   width: 100%;
   display: flex;
   align-self: center
-  /* height: 100%; */
+  height: 100%;
 }
 
 .edit-button {
@@ -196,7 +188,7 @@ h3 {
 .notifications-container {
   position: relative;
   display: inline-block;
-  /* margin-left: 350px; */
+  margin-left: 350px;
   left:100%;
 }
 
@@ -238,12 +230,12 @@ h3 {
 .auth-container {
   display: flex;
   justify-content: center;
-  width: 400px; /* Задаємо ширину */
-  height: 350px; /* Задаємо висоту */
-  background-color: #1b3533; /* Опціонально: фоновий колір */
-  color: rgb(255, 255, 255); /* Опціонально: колір тексту */
-  border-radius: 10px; /* Опціонально: закруглені кути */
-  box-shadow: 0px 4px 10px rgba(255, 246, 246, 0.295); /* Опціонально: тінь */
+  width: 400px; 
+  height: 350px; 
+  background-color: #1b3533; 
+  color: rgb(255, 255, 255); 
+  border-radius: 10px; 
+  box-shadow: 0px 4px 10px rgba(255, 246, 246, 0.295); 
   gap: 5px;
   
   position: absolute;
@@ -282,10 +274,10 @@ h3 {
 
 .user-name {
   height: 100px;
-  /* border: 1px solid #ddd; */
-  /* width: 400px; */
+  border: 1px solid #ddd;
+  width: 400px;
   display: flex;
-  /* flex-direction: column; */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 
@@ -299,7 +291,7 @@ h3 {
 }
 
 
-/* Homework */
+
 
 .homework-container {
   display: grid;
@@ -307,7 +299,7 @@ h3 {
   gap: 20px;
   width: 1400px;
   height: 500px;
-  /* padding: 0; */
+  padding: 0;
   margin-bottom: 0px;
  
 }
@@ -322,7 +314,7 @@ h3 {
   gap:20px
 
 }
-
+ */
 
 
 

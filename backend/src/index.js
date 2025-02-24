@@ -5,9 +5,10 @@ import cors from "cors";
 // import { AppContext, createAppContext } from "./ctx";
 // import { trpcRouter } from "./trpc/trpc";
 import { PrismaClient } from "@prisma/client";
+import jwt from 'jsonwebtoken';
 import bcrypt from "bcrypt";
+const cookieParser = require("cookie-parser");
 
-const JWT_SECRET = "barotrauma";
 export const prisma = new PrismaClient();
 export const router = express.Router();
 
@@ -144,12 +145,13 @@ void (async () => {
         credentials: true,
       })
     );
+    app.use(cookieParser());
 
     app.listen(3000, () => {
       console.info("Listening at http://localhost:3000");
     });
 
-    app.get("/lessons", (req, res) => {
+    app.get("/lessons", authToken, (req, res) => {
       res.json(lessons);
     });
 
@@ -185,18 +187,46 @@ void (async () => {
           },
         });
         if (!user) {
-          res.send("atyatya").status(401);
+          res.sendStatus(401);
         }
         
         if(!await bcrypt.compare(req.body.password, user.password)) {
           res.send("dalbayob password")
         }
-        res.send("megahohol")
+        const user_token = {
+          "userId": user.id,
+          "userRole":user.role
+        }
+        const access_token = jwt.sign(user_token, process.env.ACCESS_TOKEN_SECRET, {expiresIn:'45m'})
+        const refresh_token = jwt.sign(user_token, process.env.REFRESH_TOKEN_SECRET, {expiresIn:'15d'})
+        console.log(access_token)
+        res.cookie("access_token", access_token,{
+          httpOnly:true,
+          secure:false
+        })
+        await prisma.token.create({
+          data:{
+            refreshToken: refresh_token,
+            userId: user.id
+          }
+        })
+        res.json({access_token: access_token})
         
       } catch (error) {
         console.error;
       }
     });
+    function authToken(req, res, next) {
+      const authHeader = req.headers['authorization']
+      const token = authHeader && authHeader.split(' ')[1]
+      if (!token) return res.sendStatus(403)
+
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err,user_token) => {
+        if (err) return res.sendStatus(401)
+        req.user = user_token
+        next()
+      })
+    }
   } catch (error) {
     console.error(error);
   }

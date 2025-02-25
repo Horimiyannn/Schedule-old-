@@ -55,12 +55,17 @@ void (async () => {
                 time: time,
               },
             },
-            userId: userId
+            user: {
+              connect:{
+                id:userId
+              }
+            }
           },
           include: {
             times: true,
           },
         })
+        res.sendStatus(200)
       } else {
         await prisma.lessonTime.create({
           data: {
@@ -70,6 +75,7 @@ void (async () => {
             }
           }
         })
+        res.sendStatus(500)
       }
     })
 

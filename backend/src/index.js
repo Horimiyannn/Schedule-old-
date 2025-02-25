@@ -12,128 +12,6 @@ const cookieParser = require("cookie-parser");
 export const prisma = new PrismaClient();
 export const router = express.Router();
 
-const lessons = [
-  {
-    id: "1",
-    name: "Антикорупція",
-    link: "https://meet.google.com/fnm-awwv-ttn",
-    time: "11:00",
-    homework: "/homework/acd",
-    task: "task",
-    notes: "/notes",
-    DOW: [1, 2],
-  },
-  {
-    id: "2",
-    name: " Синестетика",
-    link: "https://us04web.zoom.us/j/2733973211?pwd=eodpwxtWGRr0yrkjHqgHiS06cAMXbW.1&omn=74308792215",
-    time: "17:50",
-    homework: "/homework/okn",
-    task: "test",
-    notes: "/notes",
-    DOW: [1],
-  },
-  {
-    id: "3",
-    name: "English",
-    link: "https://us04web.zoom.us/j/74829472339?pwd=SmhGeUErejY5ZmszSzJnWUh5Nk11QT09",
-    time: "9:00",
-    homework: "/homework/eng",
-    task: "test",
-    notes: "/notes",
-    DOW: [2],
-  },
-  {
-    id: "4",
-    name: "Фортепіано",
-    link: "",
-    time: "13:40",
-    homework: "",
-    task: "test",
-    notes: "/notes",
-    DOW: [2],
-  },
-  {
-    id: "5",
-    name: "Критичне мислення",
-    link: "https://us05web.zoom.us/j/81124238864?pwd=ljzVw3ypCaY9iFH5bqRN7eikcyF1po.1",
-    time: "9:00",
-    homework: "/homework/psy",
-    task: "te234st",
-    notes: "/notes",
-    DOW: [3],
-  },
-  {
-    id: "6",
-    name: "ЧАП",
-    link: "https://us05web.zoom.us/j/84314502009?pwd=aDh6LzVOOWtPOWtjbGI5Qk9DT2Mrdz09",
-    time: "12:40",
-    homework: "/homework/cap",
-    task: "test",
-    notes: "/notes",
-    DOW: [3],
-  },
-  {
-    id: "7",
-    name: "Гармонія",
-    link: "https://us05web.zoom.us/j/2294605471?pwd=ZU1CZzMxdEgzVlJDWEE5M29wWjdRZz09",
-    time: "14:20",
-    homework: "/homework/hmn",
-    task: "test",
-    notes: "/notes",
-    DOW: [3],
-  },
-  {
-    id: "8",
-    name: "Пластична виразність",
-    link: "https://meet.google.com/bqb-dfje-tgh",
-    time: "16.10",
-    homework: "",
-    task: "",
-    notes: "",
-    DOW: [3],
-  },
-  {
-    id: "9",
-    name: "Виховна година",
-    link: "https://us05web.zoom.us/j/7217337276?pwd=QzNFUGVPQ0lkMjBnM2VNV2JrM2lsUT09",
-    time: "12:40",
-    homework: " ",
-    task: "",
-    notes: "/notes",
-    DOW: [4],
-  },
-  {
-    id: "10",
-    name: " Музичний фольлор(лекція) ",
-    link: "https://meet.google.com/tdo-xdng-rqv",
-    time: "14:20",
-    homework: "/homework/cnd",
-    task: "te234st",
-    notes: "/notes",
-    DOW: [4],
-  },
-  {
-    id: "11",
-    name: "Оркестр",
-    link: "https://meet.google.com/oxz-smzz-sbn",
-    time: "10:40",
-    homework: "/homework/orc",
-    task: "test",
-    notes: "/notes",
-    DOW: [5],
-  },
-  {
-    id: "12",
-    name: "Музичний фольклор(семінар) ",
-    link: "https://meet.google.com/tdo-xdng-rqv",
-    time: "13:30",
-    homework: "/homework/fah",
-    task: "test",
-    notes: "/notes",
-    DOW: [5],
-  },
-];
 
 void (async () => {
   try {
@@ -151,9 +29,49 @@ void (async () => {
       console.info("Listening at http://localhost:3000");
     });
 
-    app.get("/lessons", authToken, (req, res) => {
+    app.get("/lessons", authToken, async (req, res) => {
+      const lessons = await prisma.lesson.findMany({
+        where: {
+          userId: req.body.userId,
+        },
+      })
       res.json(lessons);
     });
+
+    app.post("/createlesson", authToken, async (req, res) => {
+      const { lessonName, link, time, userId } = req.body
+      if (!await prisma.lesson.findFirst({
+        where: {
+          name: lessonName,
+          userId: userId,
+        }
+      })) {
+        await prisma.lesson.create({
+          data: {
+            name: lessonName,
+            link: link,
+            times: {
+              create: {
+                time: time,
+              },
+            },
+            userId: userId
+          },
+          include: {
+            times: true,
+          },
+        })
+      } else {
+        await prisma.lessonTime.create({
+          data: {
+            time: time,
+            lesson: {
+              connect: { id: lesson.id }
+            }
+          }
+        })
+      }
+    })
 
     app.post("/registration", async (req, res) => {
       try {
@@ -189,42 +107,57 @@ void (async () => {
         if (!user) {
           res.sendStatus(401);
         }
-        
-        if(!await bcrypt.compare(req.body.password, user.password)) {
+
+        if (!await bcrypt.compare(req.body.password, user.password)) {
           res.send("dalbayob password")
         }
         const user_token = {
           "userId": user.id,
-          "userRole":user.role
+          "userRole": user.role
         }
-        const access_token = jwt.sign(user_token, process.env.ACCESS_TOKEN_SECRET, {expiresIn:'45m'})
-        const refresh_token = jwt.sign(user_token, process.env.REFRESH_TOKEN_SECRET, {expiresIn:'15d'})
+        const access_token = generateAccessToken(user_token)
+        const refresh_token = jwt.sign(user_token, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '15d' })
         console.log(access_token)
-        res.cookie("access_token", access_token,{
-          httpOnly:true,
-          secure:false
+        res.cookie("access_token", access_token, {
+          httpOnly: true,
+          secure: false
         })
-        await prisma.token.create({
-          data:{
-            refreshToken: refresh_token,
-            userId: user.id
-          }
+        res.cookie("refresh_token", refresh_token, {
+          httpOnly: true,
+          secure: false
         })
-        res.json({access_token: access_token})
-        
+        res.sendStatus(200)
+
+
       } catch (error) {
         console.error;
       }
     });
+    function generateAccessToken(user_token) {
+      return jwt.sign(user_token, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '45m' })
+    }
     function authToken(req, res, next) {
-      const authHeader = req.headers['authorization']
-      const token = authHeader && authHeader.split(' ')[1]
+      const token = req.cookies.access_token
       if (!token) return res.sendStatus(403)
 
-      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err,user_token) => {
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user_token) => {
         if (err) return res.sendStatus(401)
         req.user = user_token
         next()
+      })
+    }
+    async function refreshingToken(req, res, next) {
+      const refresh_token = req.cookies.refresh_token
+      if (!refresh_token) return res.sendStatus(401)
+      const prismatoken = await prisma.token.findUnique({
+        where: {
+          refreshToken: refresh_token
+        }
+      })
+      if (!prismatoken) return res.sendStatus(403)
+      jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+        if (err) return res.sendStatus(401)
+
       })
     }
   } catch (error) {

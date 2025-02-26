@@ -1,21 +1,28 @@
 import { Sidebar } from "../../components/Sidebar/sidebar.tsx";
-import { trpc } from "../../lib/trpc.tsx";
+
 import { sortLessonsByDay } from "./sorter.ts";
 import "./index.css";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-export const MainPage = () => {
-  const { data, error, isLoading, isFetching, isError } =
-    trpc.getSchedule.useQuery();
+const MainPage = () => {
+  const [lessons, setLessons] = useState([]);
 
-  if (isLoading || isFetching) {
-    return <span>loading</span>;
-  }
+  useEffect(() => {
+    const fetchLessons = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/lessons", {
+          withCredentials: true,
+        });
+        setLessons(response.data);
+      } catch (error) {
+        console.error("Помилка:", error);
+      }
+    };
+    fetchLessons();
+  });
 
-  if (isError) {
-    return <span>{error.message}</span>;
-  }
-
-  const sortedLessons = sortLessonsByDay(data.lessons);
+  const sortedLessons = sortLessonsByDay(lessons);
 
   return (
     <div className="mainpage">
@@ -50,3 +57,5 @@ export const MainPage = () => {
     </div>
   );
 };
+
+export default MainPage;

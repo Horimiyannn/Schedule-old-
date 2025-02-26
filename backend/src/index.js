@@ -126,11 +126,13 @@ void (async () => {
         console.log(access_token)
         res.cookie("access_token", access_token, {
           httpOnly: true,
-          secure: false
+          secure: false,
+          sameSite: "lax"
         })
         res.cookie("refresh_token", refresh_token, {
           httpOnly: true,
-          secure: false
+          secure: false,
+          sameSite: "lax"
         })
         res.sendStatus(200)
 

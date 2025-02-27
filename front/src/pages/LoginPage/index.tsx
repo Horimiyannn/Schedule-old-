@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useState } from "react";
-
+import "./index.css";
 
 const AuthPage = () => {
   const [logindata, setLoginData] = useState({ email: "", password: "" });
-  
+
   const login = async () => {
     await axios.post("http://localhost:3000/login", logindata, {
       withCredentials: true,
@@ -12,11 +12,12 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-content">
-        <h1>Вхід</h1>
-        <div>
-          <label>Вхід</label>
+    <div className="auth-page">
+      <div className="auth-container">
+        <div className="auth-content">
+          <h1>Вхід</h1>
+
+          <label>Логін</label>
           <input
             type="email"
             value={logindata.email}
@@ -24,6 +25,7 @@ const AuthPage = () => {
               setLoginData({ ...logindata, email: e.target.value })
             }
           />
+          <label>Пароль</label>
           <input
             type="password"
             value={logindata.password}

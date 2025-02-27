@@ -1,6 +1,5 @@
 interface Lesson {
-  time: string;
-  DOW: number[];
+  time: string[];
   id: string;
   name: string;
   link: string;
@@ -27,14 +26,16 @@ export const sortLessonsByDay = (lessons: Lesson[]): SortedLessons => {
   })
 
   lessons.forEach((lesson) => {
-    lesson.DOW.forEach((dayNumber) => {
-      const dayName = daysOfWeek[dayNumber - 1];
-      sortedLessons[dayName].push(lesson);
+    lesson.time.forEach((days) => {
+      const [day,time] = days.split(" ");
+      if (daysOfWeek.includes(day)){
+        sortedLessons[day].push({...lesson, time:[time]})
+      }
     });
   });
 
   Object.keys(sortedLessons).forEach((day) => {
-    sortedLessons[day].sort((a, b) => a.time.localeCompare(b.time));
+    sortedLessons[day].sort((a, b) => a.time[0].localeCompare(b.time[0]));
   });
 
   return sortedLessons;

@@ -34,6 +34,9 @@ void (async () => {
         where: {
           userId: req.body.userId,
         },
+        orderBy: {
+          name:'asc'
+        }
       })
       res.json(lessons);
     });
@@ -115,7 +118,7 @@ void (async () => {
         }
 
         if (!await bcrypt.compare(req.body.password, user.password)) {
-          res.send("dalbayob password")
+          res.send("bad password")
         }
         const user_token = {
           "userId": user.id,

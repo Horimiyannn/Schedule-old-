@@ -1,14 +1,20 @@
 import axios from "axios";
 import { useState } from "react";
 import "./index.css";
+import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
+  const nav = useNavigate();
   const [logindata, setLoginData] = useState({ email: "", password: "" });
 
   const login = async () => {
-    await axios.post("http://localhost:3000/login", logindata, {
-      withCredentials: true,
-    });
+    if (
+      await axios.post("http://localhost:3000/login", logindata, {
+        withCredentials: true,
+      })
+    ) {
+      nav("/");
+    }
   };
 
   return (
@@ -16,7 +22,6 @@ const AuthPage = () => {
       <div className="auth-container">
         <div className="auth-content">
           <h1>Вхід</h1>
-
           <label>Логін</label>
           <input
             type="email"

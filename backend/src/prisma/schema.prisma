@@ -10,7 +10,7 @@ datasource db {
 model Lesson {
   id       String       @id @default(uuid())
   name     String
-  link     String
+  link     String?
   times    LessonTime[]
   homework Homework[]
   notes    String?

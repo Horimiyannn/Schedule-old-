@@ -1,20 +1,27 @@
+import CreateLesson from "../../components/Createlesson/createlesson.tsx";
 import { Sidebar } from "../../components/Sidebar/sidebar.tsx";
-
-// import { sortLessonsByDay } from "./sorter.ts";
-import "./index.css";
+import "./schedulepage.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import Day from "./scheduleday.tsx";
+// import Day from "./scheduleday.tsx";
+interface Lesson {
+  id: string;
+  name: string;
+  link: string;
+  time: string;
+}
 
-const MainPage = () => {
-  interface Lessons {
-    time: string;
-    id: string;
-    name: string;
-    link: string;
-  }
+const weekDays = [
+  "Понеділок",
+  "Вівторок",
+  "Середа",
+  "Четвер",
+  "П'ятниця",
+  "Субота",
+];
 
-  const [lessons, setLessons] = useState<Lessons[]>([]);
+const Mainpage: React.FC = () => {
+  const [lessons, setLessons] = useState<Record<string, Lesson[]>>({});
 
   useEffect(() => {
     const fetchLessons = async () => {
@@ -28,61 +35,45 @@ const MainPage = () => {
       }
     };
     fetchLessons();
-  });
+  }, []);
 
-  // const sortedLessons = sortLessonsByDay(lessons);
-
-  //   return (
-  //     <div className="mainpage">
-  //       <div>
-  //         <Sidebar />
-  //       </div>
-  //       <div className="content">
-  //         <div>
-  //           <h1>Головна</h1>
-  //         </div>
-  //         <div className="schedule">
-  //           {Object.keys(lessons).map((day) => (
-  //             <div key={day} className="schedule-day">
-  //               <h2>{day}</h2>
-  //               {lessons.map((lesson) => (
-  //                 <div key={lesson.id} className="schedule-list">
-  //                   <span className="lesson-time">{lesson.time}</span>
-  //                   <a
-  //                     href={lesson.link}
-  //                     className="lesson-name"
-  //                     target="_blank"
-  //                     rel="noopener noreferrer"
-  //                   >
-  //                     {lesson.name}
-  //                   </a>
-  //                 </div>
-  //               ))}
-  //             </div>
-  //           ))}
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // };
   return (
     <div className="mainpage">
       <Sidebar />
       <div className="content">
         <div className="top-bar">
           <h1>Головна</h1>
+          <div className="top-bar-btns">
+            <CreateLesson/>
+          </div>
         </div>
         <div className="schedule">
-          <Day />
-          <Day />
-          <Day />
-          <Day />
-          <Day />
-          <Day />
+          {weekDays.map((day) => (
+            <div key={day} className="schedule-day">
+              <h2>{day}</h2>
+              {lessons[day]?.length ? (
+                lessons[day].map((lesson) => (
+                  <div key={lesson.id} className="lesson">
+                    <span className="lesson-time">{lesson.time}</span>
+                    <a
+                      href={lesson.link}
+                      className="lesson-name"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {lesson.name}
+                    </a>
+                  </div>
+                ))
+              ) : (
+                <p>Немає занять</p>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 };
 
-export default MainPage;
+export default Mainpage;

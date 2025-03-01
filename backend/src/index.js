@@ -1,9 +1,5 @@
 import express from "express";
-// import * as trpcExpress from "@trpc/server/adapters/express";
-// import { appRouter } from "./trpc";
 import cors from "cors";
-// import { AppContext, createAppContext } from "./ctx";
-// import { trpcRouter } from "./trpc/trpc";
 import { PrismaClient } from "@prisma/client";
 import jwt from 'jsonwebtoken';
 import bcrypt from "bcrypt";
@@ -34,51 +30,84 @@ void (async () => {
         where: {
           userId: req.body.userId,
         },
-        orderBy: {
-          name:'asc'
-        }
-      })
-      res.json(lessons);
-    });
-
-    app.post("/createlesson", authToken, async (req, res) => {
-      const { lessonName, link, time, userId } = req.body
-      if (!await prisma.lesson.findFirst({
-        where: {
-          name: lessonName,
-          userId: userId,
-        }
-      })) {
-        await prisma.lesson.create({
-          data: {
-            name: lessonName,
-            link: link,
-            times: {
-              create: {
-                time: time,
-              },
+        include: {
+          times: {
+            select: {
+              time: true,
             },
-            user: {
-              connect:{
-                id:userId
-              }
-            }
-          },
-          include: {
-            times: true,
-          },
-        })
-        res.sendStatus(200)
-      } else {
-        await prisma.lessonTime.create({
-          data: {
-            time: time,
-            lesson: {
-              connect: { id: lesson.id }
+            orderBy: {
+              time: "asc"
             }
           }
+        }
+      })
+      const sortedLessons = {}
+      const dow = ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота"]
+      dow.forEach((day) => {
+        sortedLessons[day] = []
+      })
+      lessons.forEach((lesson) => {
+        lesson.times.forEach((item) => {
+          const [day, ltime] = item.time.split(" ");
+          if (dow.includes(day)) {
+            sortedLessons[day].push({ ...lesson, time: ltime })
+          }
         })
-        res.sendStatus(500)
+      })
+      res.json(sortedLessons);
+
+    });
+    app.post("/createlesson", authToken, async (req, res) => {
+      const user = req.user
+      const { name, link, time, } = req.body
+      try {
+        const newLesson = await prisma.lesson.findFirst({
+          where: {
+            name: name,
+            userId: user.userId,
+          }
+        })
+        if (!newLesson) {
+          await prisma.lesson.create({
+            data: {
+              name: name,
+              link: link,
+              times: {
+                create: {
+                  time: time,
+                },
+              },
+              user: {
+                connect: {
+                  id: user.userId
+                }
+              }
+            },
+            include: {
+              times: true,
+            },
+          })
+          res.sendStatus(200)
+        } else {
+          await prisma.lessonTime.create({
+            data: {
+              time: time,
+              lesson: {
+                connect:
+                  { id: newLesson.id }
+              }
+            },
+            include: {
+              lesson: true
+            }
+
+          })
+
+          res.sendStatus(200)
+
+        }
+      } catch (err) {
+        console.log(err)
       }
     })
 
@@ -125,18 +154,9 @@ void (async () => {
           "userRole": user.role
         }
         const access_token = generateAccessToken(user_token)
-        const refresh_token = jwt.sign(user_token, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '15d' })
-        console.log(access_token)
-        res.cookie("access_token", access_token, {
-          httpOnly: true,
-          secure: false,
-          sameSite: "lax"
-        })
-        res.cookie("refresh_token", refresh_token, {
-          httpOnly: true,
-          secure: false,
-          sameSite: "lax"
-        })
+
+        res.cookie("access_token", access_token)
+
         res.sendStatus(200)
 
 
@@ -144,6 +164,21 @@ void (async () => {
         console.error;
       }
     });
+
+    app.post("/logout", (req, res) => {
+      try {
+        res.clearCookie("access_token", { path: '/' })
+
+        res.sendStatus(200)
+      } catch (err) {
+        console.error(err)
+      }
+    })
+
+    app.get("/me", authToken, (req, res) => {
+      res.json({ authStatus: true })
+      
+    })
     function generateAccessToken(user_token) {
       return jwt.sign(user_token, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '45m' })
     }

@@ -9,11 +9,9 @@ export const Sidebar = () => {
     })
   }
 
-
   return (
     <nav className="sidebar">
       <Link to="/" className="link">Головна</Link>
-      <Link to="/auth" className="link">Авторизація</Link>
       <Link to="/auth" className="link" onClick={logout}>Вийти</Link>
     </nav>
   );

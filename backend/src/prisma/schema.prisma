@@ -43,7 +43,7 @@ model Homework {
   lesson               Lesson                 @relation(fields: [lessonId], references: [id])
   lessonId             String
   givenTo              User[]
-  deadline             DateTime
+  deadline             String
   LessonCompleteStatus LessonCompleteStatus[]
 }
 

@@ -1,4 +1,5 @@
-import CreateLesson from "../../components/Createlesson/createlesson.tsx";
+import { useNavigate } from "react-router-dom";
+import CreateLesson from "../../components/CreateLesson/createlesson.tsx";
 import { Sidebar } from "../../components/Sidebar/sidebar.tsx";
 import "./schedulepage.css";
 import axios from "axios";
@@ -22,6 +23,23 @@ const weekDays = [
 
 const Mainpage: React.FC = () => {
   const [lessons, setLessons] = useState<Record<string, Lesson[]>>({});
+  const nav = useNavigate();
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/me", {
+          withCredentials: true,
+        });
+        if (response.data.authStatus === false) {
+          nav("/auth");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    checkStatus();
+  }, [nav]);
 
   useEffect(() => {
     const fetchLessons = async () => {
@@ -44,7 +62,7 @@ const Mainpage: React.FC = () => {
         <div className="top-bar">
           <h1>Головна</h1>
           <div className="top-bar-btns">
-            <CreateLesson/>
+            <CreateLesson />
           </div>
         </div>
         <div className="schedule">

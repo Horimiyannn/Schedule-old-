@@ -55,8 +55,8 @@ void (async () => {
         })
       })
       res.json(sortedLessons);
-
     });
+
     app.post("/createlesson", authToken, async (req, res) => {
       const user = req.user
       const { name, link, time, } = req.body
@@ -64,7 +64,7 @@ void (async () => {
         const newLesson = await prisma.lesson.findFirst({
           where: {
             name: name,
-            userId: user.userId,
+            userId: user.id,
           }
         })
         if (!newLesson) {
@@ -79,7 +79,7 @@ void (async () => {
               },
               user: {
                 connect: {
-                  id: user.userId
+                  id: user.id
                 }
               }
             },
@@ -100,11 +100,8 @@ void (async () => {
             include: {
               lesson: true
             }
-
           })
-
           res.sendStatus(200)
-
         }
       } catch (err) {
         console.log(err)
@@ -135,6 +132,7 @@ void (async () => {
         console.error(error);
       }
     });
+
     app.post("/login", async (req, res) => {
       try {
         const user = await prisma.user.findUnique({
@@ -150,16 +148,13 @@ void (async () => {
           res.send("bad password")
         }
         const user_token = {
-          "userId": user.id,
-          "userRole": user.role
+          "id": user.id,
+          "role": user.role,
+          "name": user.name
         }
         const access_token = generateAccessToken(user_token)
-
         res.cookie("access_token", access_token)
-
         res.sendStatus(200)
-
-
       } catch (error) {
         console.error;
       }
@@ -168,44 +163,79 @@ void (async () => {
     app.post("/logout", (req, res) => {
       try {
         res.clearCookie("access_token", { path: '/' })
-
         res.sendStatus(200)
       } catch (err) {
         console.error(err)
       }
     })
-
-    app.get("/me", authToken, (req, res) => {
-      res.json({ authStatus: true })
-      
-    })
     function generateAccessToken(user_token) {
       return jwt.sign(user_token, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '45m' })
     }
+
+    app.get("/me", authToken, (req, res) => {
+      if (req.user) {
+        res.json({ authStatus: true })
+      } else {
+        res.json({ authStatus: false })
+      }
+    })
+
+    app.get("/homework", authToken, async (req, res) => {
+      const user = req.user
+      try {
+        const homework = await prisma.homework.findMany({
+          where: {
+            givenTo: {
+              every: {
+                id: user.id
+              }
+            }
+          }
+        })
+        res.json(homework)
+      } catch (err) {
+        console.error(err)
+      }
+
+    })
+
+    app.post("/createhomework", authToken, async (req, res) => {
+      const user = req.user
+      const newHw = req.body
+      try {
+        const newHomework = await prisma.homework.create({
+          data: {
+            givenTo: {
+              connect: {
+                id: user.id
+              }
+            },
+            lesson: {
+              connect: {
+                id: newHw.lid
+              }
+            },
+            task: newHw.task,
+            deadline: newHw.deadline
+          }
+        })
+        res.sendStatus(200)
+      } catch (error) {
+        console.error(error)
+      }
+    })
+
     function authToken(req, res, next) {
       const token = req.cookies.access_token
-      if (!token) return res.sendStatus(403)
-
-      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user_token) => {
-        if (err) return res.sendStatus(401)
-        req.user = user_token
-        next()
-      })
+      if (token) {
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user_token) => {
+          if (err) return res.sendStatus(401)
+          req.user = user_token
+        })
+      }
+      next()
     }
-    async function refreshingToken(req, res, next) {
-      const refresh_token = req.cookies.refresh_token
-      if (!refresh_token) return res.sendStatus(401)
-      const prismatoken = await prisma.token.findUnique({
-        where: {
-          refreshToken: refresh_token
-        }
-      })
-      if (!prismatoken) return res.sendStatus(403)
-      jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(401)
 
-      })
-    }
   } catch (error) {
     console.error(error);
   }

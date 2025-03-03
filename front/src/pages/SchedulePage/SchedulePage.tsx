@@ -41,17 +41,18 @@ const Mainpage: React.FC = () => {
     checkStatus();
   }, [nav]);
 
+  const fetchLessons = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/lessons", {
+        withCredentials: true,
+      });
+      setLessons(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const fetchLessons = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/lessons", {
-          withCredentials: true,
-        });
-        setLessons(response.data);
-      } catch (error) {
-        console.error("Помилка:", error);
-      }
-    };
     fetchLessons();
   }, []);
 
@@ -62,7 +63,7 @@ const Mainpage: React.FC = () => {
         <div className="top-bar">
           <h1>Головна</h1>
           <div className="top-bar-btns">
-            <CreateLesson />
+            <CreateLesson fetchLessons={fetchLessons} />
           </div>
         </div>
         <div className="schedule">

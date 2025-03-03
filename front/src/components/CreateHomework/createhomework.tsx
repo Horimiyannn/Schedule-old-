@@ -1,17 +1,31 @@
 import axios from "axios";
 import { useState } from "react";
 
+interface CreateHomeworkProps {
+  fetchHomework: () => void;
+  lessonNames: LessonName[];
+}
 
+export interface LessonName{
+  name: string;
+  id: string;
+}
 
-const CreateHomework = () => {
-  const [newHomework, setnewHomework] = useState({ task: "", lid: "", deadline: "" });
-
+const CreateHomework = ({
+  fetchHomework,
+  lessonNames,
+}: CreateHomeworkProps) => {
+  const [newHomework, setnewHomework] = useState({
+    task: "",
+    lid: "",
+    deadline: "",
+  });
   const addNewLesson = async () => {
-    await axios.post("http://localhost:3000/createlesson", newHomework, {
+    await axios.post("http://localhost:3000/createhomework", newHomework, {
       withCredentials: true,
     });
+    fetchHomework();
   };
-
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -22,31 +36,32 @@ const CreateHomework = () => {
       {isOpen && (
         <div className="lesson-create-container">
           <label>Назва уроку</label>
+          <select className="lesson-name-select" value={newHomework.lid} onChange={(e) =>setnewHomework({...newHomework, lid:e.target.value})}>
+            <option disabled value="">Вибрати урок</option>
+              {lessonNames.map((lesson) => (
+                <option key={lesson.id} value={lesson.id}>
+                  {lesson.name}
+                </option>
+              ))}
+          </select>
+          <label>Завдання</label>
           <input
             className="crtlsn-input"
-            value={newLesson.name}
+            value={newHomework.task}
             onChange={(e) =>
-              setnewHomework({ ...newLesson, name: e.target.value })
-            }
-          />
-          <label>Посилання на урок</label>
-          <input
-            className="crtlsn-input"
-            value={newLesson.link}
-            onChange={(e) =>
-              setnewHomework({ ...newLesson, link: e.target.value })
+              setnewHomework({ ...newHomework, task: e.target.value })
             }
           />
           <label>Час</label>
           <input
             className="crtlsn-input"
-            value={newLesson.time}
+            value={newHomework.deadline}
             onChange={(e) =>
-              setnewLesson({ ...newLesson, time: e.target.value })
+              setnewHomework({ ...newHomework, deadline: e.target.value })
             }
           />
           <button className="btn-1" onClick={addNewLesson}>
-            Створити
+            Додати
           </button>
         </div>
       )}

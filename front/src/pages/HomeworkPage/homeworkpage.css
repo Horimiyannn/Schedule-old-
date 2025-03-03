@@ -1,0 +1,45 @@
+.homework{
+    height: 150px;
+    width: 100%;
+    border: 1px solid red;
+    border-radius: 10px;
+    margin: 40px 0;
+}
+
+.hw-header{
+    height: 17%;
+    display: flex;
+    border-bottom: 1px solid red;
+    background-color: #545454;
+    border-radius: 10px;
+    justify-content: space-between;
+}
+
+.hw-deadline{
+    width: 20%;
+}
+
+.hw-lesson-name{
+    height: 100%;
+    font-size: large;
+    font-weight: bold;
+    
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.hw-task{
+    height: 100%;
+    background-color: rgb(145, 149, 152);
+    color: black;
+    border-radius: 10px;
+
+}
+
+.lesson-name-select{
+    height: 13%;
+    width: 80%;
+    background-color: aliceblue;
+    color:black;
+}

@@ -28,7 +28,7 @@ void (async () => {
     app.get("/lessons", authToken, async (req, res) => {
       const lessons = await prisma.lesson.findMany({
         where: {
-          userId: req.body.userId,
+          userId: req.user.id,
         },
         include: {
           times: {
@@ -190,13 +190,30 @@ void (async () => {
                 id: user.id
               }
             }
+          },
+          include: {
+            lesson: {
+              select: {
+                name: true,
+                id: true
+              }
+            }
           }
         })
-        res.json(homework)
+        const lessonNames = await prisma.lesson.findMany({
+          where: {
+            userId: user.id
+          },
+          select: {
+            name: true,
+            id: true,
+          }
+        })
+        const response = { homework, lessonNames }
+        res.json(response)
       } catch (err) {
         console.error(err)
       }
-
     })
 
     app.post("/createhomework", authToken, async (req, res) => {
@@ -229,7 +246,7 @@ void (async () => {
       const token = req.cookies.access_token
       if (token) {
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user_token) => {
-          if (err) return res.sendStatus(401)
+          if (err) res.clearCookie("access_token", { path: '/' })
           req.user = user_token
         })
       }

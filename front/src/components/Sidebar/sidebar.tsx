@@ -13,6 +13,7 @@ export const Sidebar = () => {
     <nav className="sidebar">
       <Link to="/" className="link">Головна</Link>
       <Link to="/auth" className="link" onClick={logout}>Вийти</Link>
+      <Link to="/homework" className="link">Домашнє завдання</Link>
     </nav>
   );
 };

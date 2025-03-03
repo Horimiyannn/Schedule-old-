@@ -3,16 +3,24 @@ import { useState } from "react";
 import "./createlesson.css";
 import "../../pages/SchedulePage/schedulepage.css";
 
-const CreateLesson = () => {
+interface CreateLessonProps {
+  fetchLessons: () => void;
+}
+
+const CreateLesson = ({ fetchLessons }: CreateLessonProps)  => {
   const [newLesson, setnewLesson] = useState({ name: "", link: "", time: "" });
+  const [isOpen, setIsOpen] = useState(false);
 
   const addNewLesson = async () => {
-    await axios.post("http://localhost:3000/createlesson", newLesson, {
-      withCredentials: true,
-    });
+    try {
+      await axios.post("http://localhost:3000/createlesson", newLesson, {
+        withCredentials: true,
+      });
+      fetchLessons();
+    } catch (error) {
+      console.error(error);
+    }
   };
-
-  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="lsncrt-dd">

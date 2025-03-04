@@ -1,12 +1,12 @@
-.homework{
+.homework {
     height: 150px;
-    width: 100%;
+    width: 97%;
     border: 1px solid red;
     border-radius: 10px;
-    margin: 40px 0;
+    margin: 40px ;
 }
 
-.hw-header{
+.hw-header {
     height: 17%;
     display: flex;
     border-bottom: 1px solid red;
@@ -15,31 +15,32 @@
     justify-content: space-between;
 }
 
-.hw-deadline{
+.hw-deadline {
     width: 20%;
 }
 
-.hw-lesson-name{
+.hw-lesson-name {
     height: 100%;
     font-size: large;
     font-weight: bold;
-    
+
     padding-left: 10px;
     display: flex;
     align-items: center;
 }
 
-.hw-task{
-    height: 100%;
+.hw-task {
+    height: 83%;
     background-color: rgb(145, 149, 152);
     color: black;
-    border-radius: 10px;
+    border-radius: 0px 10px 10px;
 
 }
 
-.lesson-name-select{
+.lesson-name-select {
     height: 13%;
     width: 80%;
     background-color: aliceblue;
-    color:black;
+    color: black;
 }
+

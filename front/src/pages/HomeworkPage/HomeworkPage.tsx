@@ -25,7 +25,7 @@ const HomeworkPage: React.FC = () => {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/me", {
+        const response = await axios.get("http://localhost:3000/user/me", {
           withCredentials: true,
         });
         if (response.data.authStatus === false) {
@@ -40,7 +40,7 @@ const HomeworkPage: React.FC = () => {
 
   const fetchHomework = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/homework", {
+      const response = await axios.get("http://localhost:3000/homework/gethomework", {
         withCredentials: true,
       });
       setHomework(response.data.homework);

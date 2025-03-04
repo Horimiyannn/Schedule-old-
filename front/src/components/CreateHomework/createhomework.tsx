@@ -1,12 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
+import DatePicker from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css'
+
 
 interface CreateHomeworkProps {
   fetchHomework: () => void;
   lessonNames: LessonName[];
 }
 
-export interface LessonName{
+export interface LessonName {
   name: string;
   id: string;
 }
@@ -18,10 +21,11 @@ const CreateHomework = ({
   const [newHomework, setnewHomework] = useState({
     task: "",
     lid: "",
-    deadline: "",
+    deadline: null as Date | null,
   });
+  console.log(newHomework.deadline);
   const addNewLesson = async () => {
-    await axios.post("http://localhost:3000/createhomework", newHomework, {
+    await axios.post("http://localhost:3000/homework/createhomework", newHomework, {
       withCredentials: true,
     });
     fetchHomework();
@@ -36,13 +40,21 @@ const CreateHomework = ({
       {isOpen && (
         <div className="lesson-create-container">
           <label>Назва уроку</label>
-          <select className="lesson-name-select" value={newHomework.lid} onChange={(e) =>setnewHomework({...newHomework, lid:e.target.value})}>
-            <option disabled value="">Вибрати урок</option>
-              {lessonNames.map((lesson) => (
-                <option key={lesson.id} value={lesson.id}>
-                  {lesson.name}
-                </option>
-              ))}
+          <select
+            className="lesson-name-select"
+            value={newHomework.lid}
+            onChange={(e) =>
+              setnewHomework({ ...newHomework, lid: e.target.value })
+            }
+          >
+            <option disabled value="">
+              Вибрати урок
+            </option>
+            {lessonNames.map((lesson) => (
+              <option key={lesson.id} value={lesson.id}>
+                {lesson.name}
+              </option>
+            ))}
           </select>
           <label>Завдання</label>
           <input
@@ -53,12 +65,14 @@ const CreateHomework = ({
             }
           />
           <label>Час</label>
-          <input
-            className="crtlsn-input"
-            value={newHomework.deadline}
-            onChange={(e) =>
-              setnewHomework({ ...newHomework, deadline: e.target.value })
+
+          <DatePicker
+            
+            selected={newHomework.deadline}
+            onChange={(date) =>
+              setnewHomework({ ...newHomework, deadline: date })
             }
+            
           />
           <button className="btn-1" onClick={addNewLesson}>
             Додати

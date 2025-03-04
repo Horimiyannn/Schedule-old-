@@ -28,7 +28,7 @@ const Mainpage: React.FC = () => {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/me", {
+        const response = await axios.get("http://localhost:3000/user/me", {
           withCredentials: true,
         });
         if (response.data.authStatus === false) {
@@ -43,7 +43,7 @@ const Mainpage: React.FC = () => {
 
   const fetchLessons = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/lessons", {
+      const response = await axios.get("http://localhost:3000/lesson/getlessons", {
         withCredentials: true,
       });
       setLessons(response.data);

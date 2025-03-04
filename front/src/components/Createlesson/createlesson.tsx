@@ -13,7 +13,7 @@ const CreateLesson = ({ fetchLessons }: CreateLessonProps)  => {
 
   const addNewLesson = async () => {
     try {
-      await axios.post("http://localhost:3000/createlesson", newLesson, {
+      await axios.post("http://localhost:3000/lesson/createlesson", newLesson, {
         withCredentials: true,
       });
       fetchLessons();

@@ -34,11 +34,11 @@ h1 {
 
 
 .top-bar-btn {
-  height: 5%;
-  width: 25%;
+  height: 70%;
+  width: 50%;
   background-color: rgb(214, 204, 66);
   border-radius: 7px;
-  color: rgb(94, 94, 94);
+  color: rgb(50, 50, 50);
   border: 1px solid #fa4343;
   cursor: pointer;
 }

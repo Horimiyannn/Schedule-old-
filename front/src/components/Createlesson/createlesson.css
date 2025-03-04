@@ -3,13 +3,14 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
-    top: 600px;
+    top: 100px;
     align-items: center;
     background-color: rgb(162, 194, 183);
     height: 350px;
     border-radius: 6px;
     border: 1px solid red;
     opacity: 1;
+    width: 350px;
 }
 
 

@@ -9,7 +9,7 @@ const AuthPage = () => {
 
   const login = async () => {
     if (
-      await axios.post("http://localhost:3000/login", logindata, {
+      await axios.post("http://localhost:3000/user/login", logindata, {
         withCredentials: true,
       })
     ) {

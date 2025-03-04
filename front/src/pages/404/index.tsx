@@ -1,5 +1,13 @@
+import DatePicker from "react-datepicker";
+
+
 const Errorpage = () => {
-  return <div>not found</div>;
+  return (
+    <div>
+      
+      <DatePicker />
+    </div>
+  );
 };
 
 export default Errorpage;

@@ -109,23 +109,40 @@ lsnRouter.post("/createlesson", authToken, async (req, res) => {
       console.log(err)
    }
 })
-lsnRouter.patch("/redactlesson", authToken,async (req,res) =>{
+lsnRouter.patch("/redactlesson", authToken, async (req, res) => {
    const lesson = req.body
    try {
       await prisma.lesson.update({
-         data:{
-            name:lesson.name,
-            link:lesson.link,
-            times:{
-               connect:{
-                  time
-               }
+         where:{
+            id:lesson.id,
+         },
+         data: {
+            name: lesson.name,
+            link: lesson.link,
+            times: {
+              connect:{
+               time: lesson.time
+              }
             }
          }
       })
    } catch (error) {
       console.error(error)
    }
+})
+
+
+lsnRouter.delete("/deletelesson", authToken, async(req,res) =>{
+   try {
+      await prisma.lesson.delete({
+         where:{
+            id:lesson.id
+         },
+      })
+   } catch (error) {
+      console.error(error)
+   }
+   
 })
 
 export default lsnRouter

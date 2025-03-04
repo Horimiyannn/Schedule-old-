@@ -84,6 +84,38 @@ userRouter.post("/logout", (req, res) => {
       console.error(err)
    }
 })
+
+
+
+userRouter.patch("/redactuser", authToken, async (req, res) => {
+   const user = req.body
+   try {
+      await prisma.user.update({
+         where: {
+            id: user.id
+         },
+         data: {
+            name: user.name,
+            email: user.email,
+            password: user.password,
+         }
+      })
+   } catch (error) {
+      console.error(error)
+   }
+})
+
+userRouter.delete("/deleteuser", authToken, async (req, res) => {
+   try {
+      await prisma.user.delete({
+         where: {
+            id: req.user.id
+         }
+      })
+   } catch (error) {
+      console.error(error)
+   }
+})
 function generateAccessToken(user_token) {
    return jwt.sign(user_token, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '45m' })
 }

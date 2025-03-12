@@ -1,28 +1,14 @@
 import express from "express";
-import jwt from 'jsonwebtoken';
-import { prisma } from "..";
 
+import { prisma } from "..";
+import { authToken } from "../middleware/authToken";
 const cookieParser = require("cookie-parser");
 
 const lsnRouter = express.Router()
 lsnRouter.use(express.json())
 lsnRouter.use(cookieParser())
 
-function authToken(req, res, next) {
-   try {
-      
-      const token = req.cookies.access_token
-      if (token) {
-         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user_token) => {
-            if (err) return res.clearCookie("access_token", { path: '/' })
-            req.user = user_token
-         })
-      }
-      next()
-   } catch (error) {
-      console.error(error)
-   }
-}
+
 
 lsnRouter.get("/getlessons", authToken, async (req, res) => {
    try {
@@ -34,6 +20,7 @@ lsnRouter.get("/getlessons", authToken, async (req, res) => {
             times: {
                select: {
                   time: true,
+                  id: true,
                },
                orderBy: {
                   time: "asc"
@@ -54,10 +41,10 @@ lsnRouter.get("/getlessons", authToken, async (req, res) => {
       lessons.forEach((lesson) => {
          lesson.times.forEach((item) => {
             const [day, ltime] = item.time.split(" ");
-            
+
             schedule.forEach((days) => {
                if (days.name === day) {
-                  days.lessons.push({...lesson, time: ltime })
+                  days.lessons.push({ ...lesson, time: ltime })
                   lesson.time = ltime
                }
             })
@@ -122,23 +109,29 @@ lsnRouter.post("/createlesson", authToken, async (req, res) => {
       console.log(err)
    }
 })
-lsnRouter.patch("/redactlesson", authToken, async (req, res) => {
+lsnRouter.patch("/editlesson", authToken, async (req, res) => {
    const lesson = req.body
    try {
+      console.log(lesson)
       await prisma.lesson.update({
          where: {
             id: lesson.id,
          },
+
          data: {
             name: lesson.name,
             link: lesson.link,
-            times: {
-               connect: {
-                  time: lesson.time
-               }
-            }
          }
       })
+      await Promise.all(
+         lesson.times.map(t =>
+            prisma.lessonTime.update({
+               where: { id: t.id },
+               data: { time: t.time }
+            })
+         )
+      )
+      res.sendStatus(200)
    } catch (error) {
       console.error(error)
    }
@@ -152,6 +145,7 @@ lsnRouter.post("/deletelesson", authToken, async (req, res) => {
             id: req.body.data
          },
       })
+      res.sendStatus(200)
    } catch (error) {
       console.error(error)
    }

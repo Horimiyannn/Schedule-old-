@@ -3,26 +3,12 @@ import bcrypt from "bcrypt";
 import express from "express";
 import { prisma } from "..";
 const cookieParser = require("cookie-parser");
+import { authToken } from '../middleware/authToken';
 
 const userRouter = express.Router()
 userRouter.use(express.json())
 userRouter.use(cookieParser())
 
-function authToken(req, res, next) {
-   try {
-      const token = req.cookies.access_token
-      if (token) {
-         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user_token) => {
-            if (err) return res.clearCookie("access_token", { path: '/' })
-            req.user = user_token
-         })
-      }
-      next()
-   } catch (error) {
-      console.error(error)
-   }
-
-}
 
 userRouter.post("/registration", async (req, res) => {
    try {
@@ -33,7 +19,7 @@ userRouter.post("/registration", async (req, res) => {
          },
       });
       if (candidate) {
-         res.send("Вже є така пошта, атятя");
+         res.sendStatus(400);
       }
       const hashedPassword = await bcrypt.hash(password, 5);
       const newUser = await prisma.user.create({
@@ -117,7 +103,7 @@ userRouter.delete("/deleteuser", authToken, async (req, res) => {
    }
 })
 function generateAccessToken(user_token) {
-   return jwt.sign(user_token, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '45m' })
+   return jwt.sign(user_token, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15d' })
 }
 
 userRouter.get("/me", authToken, (req, res) => {

@@ -11,8 +11,8 @@ export type lesson = {
   time: string;
   name: string;
   link?: string;
-  times?: times[];
-  userid?: string
+  times: times[];
+  userid: string
 };
 
 export type times = {

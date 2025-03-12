@@ -113,12 +113,16 @@ h1 {
 }
 
 .lesson-name {
-  width: 80%;
+  width: 70%;
   height: 100%;
   align-content: center;
   padding: 10px;
   text-decoration: none;
   color: aquamarine;
+}
+
+.lesson-btns{
+  display: flex;
 }
 
 .lesson-notes {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import "./createlesson.css";
-import "../../pages/SchedulePage/schedulepage.css";
+import "../../../pages/SchedulePage/schedulepage.css";
 
 interface CreateLessonProps {
   fetchLessons: () => void;
@@ -20,6 +20,8 @@ const CreateLesson = ({ fetchLessons }: CreateLessonProps)  => {
     } catch (error) {
       console.error(error);
     }
+    setnewLesson({ name: "", link: "", time: "" })
+    setIsOpen(false)
   };
 
   return (
@@ -36,6 +38,7 @@ const CreateLesson = ({ fetchLessons }: CreateLessonProps)  => {
             onChange={(e) =>
               setnewLesson({ ...newLesson, name: e.target.value })
             }
+            
           />
           <label>Посилання на урок</label>
           <input

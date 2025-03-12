@@ -36,7 +36,8 @@ html, body{
   background-color: rgb(62, 180, 184);
   border-radius: 7px;
   color: black;
-  border: 1px solid #fa4343
+  border: 1px solid #fa4343;
+  cursor: pointer;
 }
 
 

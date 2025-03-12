@@ -1,9 +1,10 @@
-import CreateLesson from "../../components/CreateLesson/createlesson.tsx";
+import CreateLesson from "../../components/Lesson/CreateLesson/createlesson.tsx";
 import { Sidebar } from "../../components/Sidebar/sidebar.tsx";
 import "./schedulepage.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Day } from "../../types/LessonType.ts";
+import EditLesson from "../../components/Lesson/EditLesson/EditLesson.tsx";
 
 const Mainpage: React.FC = () => {
   const [lessons, setLessons] = useState<Day[]>([]);
@@ -14,7 +15,6 @@ const Mainpage: React.FC = () => {
         const response = await axios.get("http://localhost:3000/user/me", {
           withCredentials: true,
         });
-        console.log(response.data.authStatus);
         if (response.data.authStatus === false) {
           window.location.replace("/auth");
         }
@@ -24,6 +24,7 @@ const Mainpage: React.FC = () => {
     };
     checkStatus();
   }, []);
+  // console.log(lessons)
 
   const fetchLessons = async () => {
     try {
@@ -34,6 +35,18 @@ const Mainpage: React.FC = () => {
         }
       );
       setLessons(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const deleteLesson = async (id: string) => {
+    try {
+      await axios.post(
+        "http://localhost:3000/lesson/deletelesson",
+        { data: id },
+        { withCredentials: true }
+      );
+      fetchLessons();
     } catch (error) {
       console.error(error);
     }
@@ -65,17 +78,6 @@ const Mainpage: React.FC = () => {
               <div className="day-name">{day.name}</div>
               <div className="day-lessons">
                 {day.lessons.map((lesson) => {
-                  const deleteLesson = async () => {
-                    try {
-                      console.log(lesson.id);
-                      await axios.post(
-                        "http://localhost:3000/lesson/deletelesson",{data:lesson.id},{withCredentials: true}
-                      );
-                      fetchLessons()
-                    } catch (error) {
-                      console.error(error);
-                    }
-                  };
                   return (
                     <div key={lesson.id} className="lesson">
                       <div className="lesson-time">{lesson.time}</div>
@@ -88,12 +90,18 @@ const Mainpage: React.FC = () => {
                       </a>
 
                       {redIsOpen && (
-                        <button
-                          className="deletebutton"
-                          onClick={() => deleteLesson()}
-                        >
-                          X
-                        </button>
+                        <div className="lesson-btns">
+                          <button
+                            className="deletebutton"
+                            onClick={() => deleteLesson(lesson.id)}
+                          >
+                            X
+                          </button>
+                          <EditLesson
+                            fetchLessons={fetchLessons}
+                            lesson={lesson}
+                          />
+                        </div>
                       )}
                     </div>
                   );

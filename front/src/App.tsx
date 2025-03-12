@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+
 import MainPage from "./pages/SchedulePage/SchedulePage";
 import AuthPage from "./pages/LoginPage";
 import Errorpage from "./pages/404";

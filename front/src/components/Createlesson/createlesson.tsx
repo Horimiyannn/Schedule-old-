@@ -25,7 +25,7 @@ const CreateLesson = ({ fetchLessons }: CreateLessonProps)  => {
   return (
     <div className="lsncrt-dd">
       <button className="top-bar-btn" onClick={() => setIsOpen(!isOpen)}>
-        Створити новий урок
+        Новий урок
       </button>
       {isOpen && (
         <div className="lesson-create-container">

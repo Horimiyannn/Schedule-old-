@@ -12,16 +12,17 @@ model Lesson {
   name     String
   link     String?
   times    LessonTime[]
-  homework Homework[]
+  homework Homework[]   
   user     User         @relation(fields: [userId], references: [id])
   userId   String
+  time     String?
 }
 
 model LessonTime {
   id       String @id @default(uuid())
-  time     String 
+  time     String
   lessonId String
-  lesson   Lesson @relation(fields: [lessonId], references: [id])
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -37,14 +38,12 @@ model User {
 model Homework {
   id             String  @id @default(uuid())
   task           String
-  lesson         Lesson  @relation(fields: [lessonId], references: [id])
+  lesson         Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   lessonId       String
   givenTo        User[]
   deadline       String
   completeStatus Boolean @default(false)
 }
-
-
 
 enum Role {
   STUDENT

@@ -4,7 +4,7 @@ import axios from "axios";
 
 export const Sidebar = () => {
   const logout = async () =>{
-    await axios.post("http://localhost:3000/logout","", {
+    await axios.post("http://localhost:3000/user/logout","", {
       withCredentials: true,
     })
   }

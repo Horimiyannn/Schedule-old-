@@ -1,6 +1,7 @@
 import express from "express";
 import jwt from 'jsonwebtoken';
 import { prisma } from "..";
+
 const cookieParser = require("cookie-parser");
 
 const lsnRouter = express.Router()
@@ -9,6 +10,7 @@ lsnRouter.use(cookieParser())
 
 function authToken(req, res, next) {
    try {
+      
       const token = req.cookies.access_token
       if (token) {
          jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user_token) => {
@@ -39,22 +41,33 @@ lsnRouter.get("/getlessons", authToken, async (req, res) => {
             }
          }
       })
-      const sortedLessons = {}
-      const dow = ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота"]
-      dow.forEach((day) => {
-         sortedLessons[day] = []
-      })
+
+      const schedule =
+         [
+            { id: 0, name: "Понеділок", lessons: [] },
+            { id: 1, name: "Вівторок", lessons: [] },
+            { id: 2, name: "Середа", lessons: [] },
+            { id: 3, name: "Четвер", lessons: [] },
+            { id: 4, name: "Пятниця", lessons: [] },
+            { id: 5, name: "Субота", lessons: [] }
+         ]
       lessons.forEach((lesson) => {
          lesson.times.forEach((item) => {
             const [day, ltime] = item.time.split(" ");
-            if (dow.includes(day)) {
-               sortedLessons[day].push({ ...lesson, time: ltime })
-            }
+            
+            schedule.forEach((days) => {
+               if (days.name === day) {
+                  days.lessons.push({...lesson, time: ltime })
+                  lesson.time = ltime
+               }
+            })
          })
       })
-      res.json(sortedLessons);
+
+      res.json(schedule);
    } catch (error) {
       console.error(error)
+      res.sendStatus(500)
    }
 
 });
@@ -113,16 +126,16 @@ lsnRouter.patch("/redactlesson", authToken, async (req, res) => {
    const lesson = req.body
    try {
       await prisma.lesson.update({
-         where:{
-            id:lesson.id,
+         where: {
+            id: lesson.id,
          },
          data: {
             name: lesson.name,
             link: lesson.link,
             times: {
-              connect:{
-               time: lesson.time
-              }
+               connect: {
+                  time: lesson.time
+               }
             }
          }
       })
@@ -132,17 +145,17 @@ lsnRouter.patch("/redactlesson", authToken, async (req, res) => {
 })
 
 
-lsnRouter.delete("/deletelesson", authToken, async(req,res) =>{
+lsnRouter.post("/deletelesson", authToken, async (req, res) => {
    try {
       await prisma.lesson.delete({
-         where:{
-            id:lesson.id
+         where: {
+            id: req.body.data
          },
       })
    } catch (error) {
       console.error(error)
    }
-   
+
 })
 
 export default lsnRouter
